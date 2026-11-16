@@ -177,6 +177,14 @@ describe('a photo full screen', () => {
 describe('adding a photo', () => {
   afterEach(cleanup);
 
+  it('shows the whole photo in the frame, not a crop of it', async () => {
+    await render();
+    const img = await screen.findByRole('img', { name: 'Photo 1 of 3' });
+    expect(img).toHaveClass('object-contain');
+    expect(img).not.toHaveClass('object-cover');
+    expect(screen.getByRole('region', { name: 'Photos' })).toHaveClass('aspect-square');
+  });
+
   it('offers the camera beside the album', async () => {
     await render();
     await screen.findByRole('button', { name: 'Take a photo' });
