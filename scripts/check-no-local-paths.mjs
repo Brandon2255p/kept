@@ -82,6 +82,7 @@ export const PRIVATE_IPV4_ALLOWED = new Map([
   ['apps/web/src/components/import/inspect-step.tsx', 'a LAN address as an input placeholder'],
   ['compose.yaml', "Kept's own Compose network"],
   ['compose.full.yaml', "Kept's own Compose network, and Caddy's fixed address on it"],
+  ['compose.tailscale.yaml', "Kept's own Compose network, and Tailscale's fixed address on it"],
   ['apps/docs/src/content/docs/install/https.md', "Kept's own Compose network"],
   ['apps/docs/src/content/docs/install/reverse-proxy.md', 'an example proxy address'],
   [
