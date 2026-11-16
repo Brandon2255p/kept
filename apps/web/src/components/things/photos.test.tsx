@@ -173,3 +173,20 @@ describe('a photo full screen', () => {
     expect(shown()).not.toBe(first);
   });
 });
+
+describe('adding a photo', () => {
+  afterEach(cleanup);
+
+  it('offers the camera beside the album', async () => {
+    await render();
+    await screen.findByRole('button', { name: 'Take a photo' });
+    await screen.findByRole('button', { name: 'Gallery' });
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('input[type="file"]')];
+    const camera = inputs.find((i) => i.getAttribute('capture') === 'environment');
+    const album = inputs.find((i) => !i.hasAttribute('capture'));
+    expect(camera?.accept).toBe('image/*');
+    expect(camera?.multiple).toBe(false);
+    expect(album?.accept).toBe('image/*');
+    expect(album?.multiple).toBe(true);
+  });
+});

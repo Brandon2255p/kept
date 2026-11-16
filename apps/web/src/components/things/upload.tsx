@@ -14,7 +14,7 @@
  */
 import { isErrorCode, newId } from '@kept/shared';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { FileTrigger, ProgressBar } from 'react-aria-components';
 import { ApiError, api, isApiError } from '@/api/client';
 import { inventoryPaths } from '@/api/inventory/paths';
@@ -26,7 +26,7 @@ import type {
   FileClass,
   FileView,
 } from '@/api/inventory/types';
-import { CameraIcon } from '@/components/icons';
+import { CameraIcon, GalleryIcon } from '@/components/icons';
 import { useErrorText } from '@/components/page';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
@@ -187,12 +187,17 @@ export function nameOfFile(file: Pick<File, 'name'>): string | undefined {
 /**
  * A button that picks files and uploads each one, with a progress bar while it runs. HEIC gets
  * an informational toast ("Preview unavailable"), never an error.
+ *
+ * With `cameraLabel`, a second button beside it opens the camera (`capture=environment`): a phone's
+ * photo picker (Android's, since Chrome 14) offers no camera of its own, so picking alone would
+ * leave the person only the album.
  */
 export function UploadButton({
   locationId,
   subject,
   attachAs,
   label,
+  cameraLabel,
   accept,
   variant = 'secondary',
   nameFromFile = false,
@@ -203,6 +208,8 @@ export function UploadButton({
   /** The attachment's role (photo, receipt, manual, …). */
   attachAs: AttachmentRole;
   label: string;
+  /** A "Take a photo" button too, opening the back camera; the picker then shows the album. */
+  cameraLabel?: string;
   accept?: string[];
   variant?: ButtonVariant;
   /** #183, #348: the file keeps its own name ("Insurance 2026"), renamed any time. */
@@ -242,18 +249,37 @@ export function UploadButton({
       }
     }
   };
+  const picker = (icon: ReactNode) => (
+    <FileTrigger
+      {...(accept ? { acceptedFileTypes: accept } : {})}
+      allowsMultiple
+      onSelect={(files) => void run(files)}
+    >
+      <Button variant={variant} size="small" isPending={progress !== null}>
+        {icon}
+        {label}
+      </Button>
+    </FileTrigger>
+  );
   return (
     <div className="grid gap-1.5">
-      <FileTrigger
-        {...(accept ? { acceptedFileTypes: accept } : {})}
-        allowsMultiple
-        onSelect={(files) => void run(files)}
-      >
-        <Button variant={variant} size="small" isPending={progress !== null}>
-          <CameraIcon className="size-4" />
-          {label}
-        </Button>
-      </FileTrigger>
+      {cameraLabel ? (
+        <div className="flex flex-wrap gap-2">
+          <FileTrigger
+            {...(accept ? { acceptedFileTypes: accept } : {})}
+            defaultCamera="environment"
+            onSelect={(files) => void run(files)}
+          >
+            <Button variant={variant} size="small" isPending={progress !== null}>
+              <CameraIcon className="size-4" />
+              {cameraLabel}
+            </Button>
+          </FileTrigger>
+          {picker(<GalleryIcon className="size-4" />)}
+        </div>
+      ) : (
+        picker(<CameraIcon className="size-4" />)
+      )}
       {progress !== null ? (
         <ProgressBar
           aria-label={t`Uploading`}
