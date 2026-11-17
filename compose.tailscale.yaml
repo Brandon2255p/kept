@@ -22,6 +22,9 @@ x-kept-image: &kept-image
   # changes that line (`docker compose pull && docker compose up -d`). To run your own build, in a
   # checkout: `docker build -t kept:local .` and KEPT_IMAGE=kept:local.
   image: ${KEPT_IMAGE:-ghcr.io/keptinventory/kept:1.14.7}
+  # Fetch the image on every `up`, so a moving tag (`:latest`, a branch) brings the new build
+  # instead of the copy already on the host. KEPT_PULL_POLICY=missing for a local build.
+  pull_policy: ${KEPT_PULL_POLICY:-always}
   read_only: true
   tmpfs: [/tmp]
   cap_drop: [ALL]
